@@ -1,4 +1,5 @@
 from cProfile import label
+from http import server
 from tkinter.ttk import Progressbar
 from tkinter import *
 from tkinter import ttk
@@ -114,13 +115,13 @@ class Loginregisteruser:
         file = open('database.txt','r')
         
         for i in file :
-            name,email,password = i.split(",")
+            id,email,password = i.split(",")
             password = password.strip()
             if get_username == email and get_password == password:
                 sukses = True
                 break
         if (sukses):
-            msg.showinfo("Login Success","Selamat Datang Di JB-in Diamond %s"%(name),parent=self.gui)
+            msg.showinfo("Login Success","Selamat Datang Di JB-in Diamond %s"%(id),parent=self.gui)
             self.sec_screen()
             return 
         elif get_username == '' or get_password == '':
@@ -142,23 +143,23 @@ class Loginregisteruser:
     def sec_screen(self):
         global screen2
         screen2 = Toplevel(app)
-        screen2.title("Register JB-in aja")
+        screen2.title("JB-in aja")
         screen2.geometry('400x450')
         screen2.resizable(0,0)
               
         Label(screen2,text="DIAMOND MOBILE LEGENDS" ,bg='blue',width='300',height='2',font= ('courier new',13, "bold"),fg='white').pack()
         Label(screen2, text='').pack()
-        Label(screen2,text= "User ID\t\t:",).place(x=30, y=70)
+        Label(screen2,text= "User id\t\t:",).place(x=30, y=70)
         self.entryID = Entry(screen2, font = ("times new roman", 10))
         self.entryID.place(x=140, y=70)
         
-        self.radio = IntVar()
+        self.radio = StringVar(value="...")
         Label(screen2, text = "Server\t\t:").place(x=30, y=90)
-        self.entrySrv1 = Radiobutton(screen2, text = 'Asia', variable=self.radio,value =1,command=self.asia_srv)
+        self.entrySrv1 = Radiobutton(screen2, text = 'Asian', variable=self.radio,value="Asian",command=self.asia_srv)
         self.entrySrv1.place(x = 140, y = 90)
-        self.entrySrv2 = Radiobutton(screen2, text = 'Europe', variable=self.radio,value =2,command=self.euro_srv)
+        self.entrySrv2 = Radiobutton(screen2, text = 'Europe', variable=self.radio,value="Europe",command=self.euro_srv)
         self.entrySrv2.place(x = 140, y = 110)
-        self.entrySrv3 = Radiobutton(screen2, text = 'America', variable=self.radio,value =3,command=self.amer_srv)
+        self.entrySrv3 = Radiobutton(screen2, text = 'America', variable=self.radio,value="America",command=self.amer_srv)
         self.entrySrv3.place(x = 140, y = 130)
         
         Label(screen2, text='Region\t\t:').place(x=30, y=160)
@@ -175,7 +176,7 @@ class Loginregisteruser:
         self.strpym = StringVar(value='...') 
         self.combobox1 = ttk.Combobox(screen2,width = 17,font = ("times new roman", 10), textvariable = self.strpym, state ="readonly")
         self.combobox1.place(x=140, y=250)
-        self.combobox1['values'] = ('Gopay','Dana','OVO','BCA','BRI')
+        self.combobox1['values'] = ('Gopay','Dana','OVO')
         
         btn = Button(screen2, text="Pay", command=self.payment,bg= 'lightgreen',state=ACTIVE)
         btn.place(x=270 ,y= 247)
@@ -185,39 +186,35 @@ class Loginregisteruser:
 
     def payment(self):
         pym = self.strpym.get()
-        
+
         if pym == 'Gopay' :
-            Label(screen2, text='No Handphone\t\t:').place(x=30,y=280)
+            Label(screen2,text= "No Handphone\t\t:",).place(x=30, y=280)
             self.entrynum = Entry(screen2, font = ("times new roman", 10))
-            self.entrynum.place(x=140, y= 280)
+            self.entrynum.place(x=140, y=280)
         elif pym == 'Dana':
-            Label(screen2, text='No Handphone\t\t:').place(x=30,y=280)
+            Label(screen2,text= "No Handphone\t\t:",).place(x=30, y=280)
             self.entrynum = Entry(screen2, font = ("times new roman", 10))
-            self.entrynum.place(x=140, y= 280)
-        elif pym == 'OVO':
-            Label(screen2, text='No Handphone\t\t:').place(x=30,y=280)
+            self.entrynum.place(x=140, y=280)
+        else :
+            Label(screen2,text= "No Handphone\t\t:",).place(x=30, y=280)
             self.entrynum = Entry(screen2, font = ("times new roman", 10))
-            self.entrynum.place(x=140, y= 280)
-        elif pym == 'BRI':
-            Label(screen2, text='No Rekening\t\t:').place(x=30,y=280)
-            self.entrynum = Entry(screen2, font = ("times new roman", 10))
-            self.entrynum.place(x=140, y= 280)
-        else:
-            Label(screen2, text ='No Rekening\t\t:').place(x=30, y= 280)
-            self.entryrek = Entry(screen2, font=("times new roman", 10))
-            self.entryrek.place(x=140, y=280)
-            
+            self.entrynum.place(x=140, y=280)
+
     def btn_sub(self):
-        name = self.entryID.get()
+        id = self.entryID.get()
         srv = self.radio.get()
         nom = self.radiobtn.get()
         pym = self.strpym.get()
         date = dt.datetime.now()
-        
-        if name == "" :
+        py = self.entrynum.get()
+
+        if id == "":
             msg.showwarning("Peringatan","ID Tidak Boleh Kosong!",parent=self.gui)
             return
-        if srv == 0:
+        if len(id) <= 6:
+            msg.showwarning("Peringatan","ID Terlalu Pendek!",parent=self.gui)
+            return
+        if srv == "...":
             msg.showwarning("Peringatan","Server Tidak Boleh Kosong!",parent=self.gui)
             return
         if nom == 0:
@@ -226,15 +223,21 @@ class Loginregisteruser:
         if pym == "...":
             msg.showwarning("Peringatan","Harap Pilih Metode Pembayaran!",parent=self.gui)
             return
+        if py == "":
+            msg.showwarning("Peringatan","No HP Tidak Boleh Kosong!",parent=self.gui)
+            return
+        if len(py) <= 10:
+            msg.showwarning("Peringatan","No HP Terlalu Pendek!",parent=self.gui)
+            return
         else :
-            msg.showinfo("DIAMOND {Top Up Diamond Mobile Legends'Bang-Bang'}",f"User ID\t\t\t: {self.entryID.get()} \nTanggal Pemesanan\t: {date:%A, %B %d, %Y}\nMetode Pembayaran\t: {self.strpym.get()} \nTotal Pembayaran\t\t: Rp.{self.radiobtn.get()},- \nStatus Pembayaran\t: Sedang Diproses!" )
+            msg.showinfo("Top Up Diamond Mobile Legends Bang-Bang",f"User id\t\t\t: {self.entryID.get()} \nServer\t\t\t: {self.radio.get()} \nTanggal Pemesanan\t: {date:%A, %d %B %Y} \nMetode Pembayaran\t: {self.strpym.get()} \nNomor\t\t\t: {self.entrynum.get()} \nTotal Pembayaran\t\t: Rp.{self.radiobtn.get()},- \nStatus Pembayaran\t: Sedang Diproses!" )
             self.close_gui()
 
     def asia_srv(self):
         self.region = StringVar(value="...")
         self.region1 = ttk.Combobox(screen2,width=17,font=('times new romance',10),textvariable=self.region,state="readonly")
         self.region1.place(x=140, y=160)
-        self.region1['values'] = ('Japan','Indonesia','China','Thai','Philippines')
+        self.region1['values'] = ('Japan','Indonesia','China','Thailand','Philippines')
    
     def euro_srv(self):
         self.region = StringVar(value="...")
@@ -282,7 +285,7 @@ def new_win():
     bg = PhotoImage(file='Back.png')
     a_label = Label(app, image=bg)
     a_label.place(x=0, y=0, relheight=1, relwidth=1)
-    start = Loginregisteruser(app,"JBin Aja")
+    start = Loginregisteruser(app,"JB-in Aja")
     app.mainloop()
 
 def bar():
